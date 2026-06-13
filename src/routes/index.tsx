@@ -265,31 +265,87 @@ function Portfolio() {
         </section>
 
         {/* ABOUT */}
-        <section id="about" className="py-20 sm:py-28 border-t border-border">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8 grid gap-12 md:grid-cols-[1fr_1.2fr] items-start">
-            <div className="reveal">
-              <p className="text-accent text-sm font-medium tracking-wider uppercase">About</p>
-              <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">
-                Engineering for visibility, speed, and results.
-              </h2>
-            </div>
-            <div className="reveal space-y-5 text-muted-foreground leading-relaxed">
-              <p>
-                I am a fullstack developer focused on building high-performance,
-                SEO-optimized web experiences. I work across both frontend and backend
-                systems to create digital products that are fast, scalable, and
-                structured for real-world use.
-              </p>
-              <p>
-                I combine web development with content strategy, analytics, and
-                copywriting to improve how digital products are discovered,
-                understood, and used.
-              </p>
-              <p>
-                My goal is to build systems that perform well on search engines,
-                deliver strong user experiences, and help businesses turn traffic
-                into meaningful results.
-              </p>
+        <section id="about" className="py-20 sm:py-28 border-t border-border relative overflow-hidden">
+          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+          <div className="mx-auto max-w-6xl px-5 sm:px-8 relative">
+            <div className="grid gap-12 md:grid-cols-[1fr_1.3fr] items-start">
+              <div className="reveal md:sticky md:top-24">
+                <p className="text-accent text-sm font-medium tracking-wider uppercase">About</p>
+                <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">
+                  Engineering for visibility, speed, and results.
+                </h2>
+                <p className="mt-5 text-muted-foreground leading-relaxed">
+                  A fullstack developer building web systems that rank, load fast,
+                  and convert — from database to design system.
+                </p>
+                <div className="mt-8 grid grid-cols-2 gap-3 max-w-sm">
+                  {[
+                    { k: "2+", v: "Years coding" },
+                    { k: "95+", v: "Lighthouse avg" },
+                    { k: "10+", v: "Tech stack" },
+                    { k: "100%", v: "Remote ready" },
+                  ].map((s) => (
+                    <div key={s.v} className="rounded-lg border border-border bg-card p-3">
+                      <p className="text-accent text-lg font-semibold">{s.k}</p>
+                      <p className="text-xs text-muted-foreground">{s.v}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="reveal space-y-6">
+                <div className="space-y-5 text-muted-foreground leading-relaxed">
+                  <p>
+                    I&apos;m <span className="text-foreground font-medium">George Abisola Victor</span>, a
+                    fullstack developer focused on building high-performance,
+                    SEO-optimized web experiences. I work across frontend and backend
+                    systems to ship digital products that are fast, scalable, and
+                    structured for real-world use.
+                  </p>
+                  <p>
+                    I combine engineering with content strategy, analytics, and
+                    copywriting — so the sites I build aren&apos;t just well-coded,
+                    they&apos;re discoverable, understandable, and conversion-focused.
+                  </p>
+                </div>
+
+                <ul className="grid gap-3 sm:grid-cols-2 pt-2">
+                  {[
+                    { t: "Fullstack engineering", d: "React, Node.js, REST APIs, PostgreSQL." },
+                    { t: "Technical SEO", d: "Schema, metadata, sitemaps, indexing." },
+                    { t: "Web performance", d: "Core Web Vitals, caching, lazy-loading." },
+                    { t: "Content & analytics", d: "Copy, GA4, Search Console insights." },
+                  ].map((c) => (
+                    <li
+                      key={c.t}
+                      className="card-hover rounded-xl border border-border bg-card p-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="mt-1 grid h-6 w-6 place-items-center rounded-md bg-accent/15 text-accent text-xs font-bold">
+                          ✓
+                        </span>
+                        <div>
+                          <p className="font-medium text-foreground text-sm">{c.t}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{c.d}</p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="rounded-xl border border-border bg-card p-5 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Currently</p>
+                    <p className="font-medium mt-1">Open to fullstack & SEO roles</p>
+                  </div>
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90 transition"
+                  >
+                    Get in touch →
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
