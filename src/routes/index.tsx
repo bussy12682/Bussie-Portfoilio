@@ -8,7 +8,7 @@ import projectFrontend from "@/assets/project-frontend.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "George Abisola Victor — Fullstack Developer | SEO & Web Performance Specialist" },
+      { title: "George Abisola Victor | Fullstack Developer | SEO & Web Performance Specialist" },
       {
         name: "description",
         content:
@@ -235,7 +235,7 @@ function Portfolio() {
                 {[
                   { k: "100", v: "Lighthouse" },
                   { k: "10+", v: "Skills" },
-                  { k: "3+", v: "Projects" },
+                  { k: "20+", v: "Projects" },
                 ].map((s) => (
                   <div key={s.v} className="rounded-lg border border-border bg-card p-3">
                     <dt className="text-accent text-xl font-semibold">{s.k}</dt>
@@ -280,7 +280,7 @@ function Portfolio() {
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3 max-w-sm">
                   {[
-                    { k: "2+", v: "Years coding" },
+                    { k: "3+", v: "Years coding" },
                     { k: "95+", v: "Lighthouse avg" },
                     { k: "10+", v: "Tech stack" },
                     { k: "100%", v: "Remote ready" },
@@ -402,7 +402,7 @@ function Portfolio() {
                   <div className="aspect-[16/10] overflow-hidden border-b border-border">
                     <img
                       src={p.image}
-                      alt={`${p.title} — ${p.tag} project preview`}
+                      alt={`${p.title}, ${p.tag} project preview`}
                       loading="lazy"
                       width={1280}
                       height={800}
@@ -447,7 +447,7 @@ function Portfolio() {
                 Why hire me
               </p>
               <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">
-                I build web systems that don't just look good — they perform.
+                I build web systems that don't just look good, they perform.
               </h2>
             </div>
             <div className="reveal grid gap-4 sm:grid-cols-2">
