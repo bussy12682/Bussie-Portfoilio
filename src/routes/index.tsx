@@ -119,6 +119,21 @@ function Portfolio() {
     document.documentElement.classList.add("dark");
   }, []);
 
+  // Lock body scroll + close on Escape when menu is open
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   const close = () => setMenuOpen(false);
 
   return (
@@ -126,7 +141,7 @@ function Portfolio() {
       {/* NAV */}
       <header
         ref={navRef}
-        className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border"
+        className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border"
       >
         <nav className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#home" className="flex items-center gap-2 font-semibold tracking-tight">
@@ -154,46 +169,59 @@ function Portfolio() {
             Hire Me
           </a>
           <button
+            type="button"
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             onClick={() => setMenuOpen((v) => !v)}
-            className={`md:hidden hb ${menuOpen ? "open" : ""} relative h-10 w-10 grid place-items-center rounded-md border border-border`}
+            className={`md:hidden hb ${menuOpen ? "open" : ""} relative z-[60] h-10 w-10 grid place-items-center rounded-md border border-border bg-background/70`}
           >
             <span className="sr-only">Menu</span>
-            <span className="flex flex-col gap-1.5">
+            <span className="relative flex flex-col gap-1.5">
               <span className="hb-line block h-0.5 w-6 bg-foreground" />
               <span className="hb-line block h-0.5 w-6 bg-foreground" />
               <span className="hb-line block h-0.5 w-6 bg-foreground" />
             </span>
           </button>
         </nav>
-
-        {/* Mobile slide menu */}
-        <div
-          className={`mobile-menu md:hidden fixed inset-y-0 right-0 top-16 z-40 w-72 bg-card border-l border-border p-6 ${menuOpen ? "open" : ""}`}
-        >
-          <ul className="flex flex-col gap-1 text-lg">
-            {["About", "Skills", "Projects", "Why Me", "Contact"].map((l) => (
-              <li key={l}>
-                <a
-                  onClick={close}
-                  href={`#${l.toLowerCase().replace(" ", "-")}`}
-                  className="block rounded-md px-3 py-3 hover:bg-muted transition"
-                >
-                  {l}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a
-            onClick={close}
-            href="#contact"
-            className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-3 font-medium text-accent-foreground"
-          >
-            Hire Me
-          </a>
-        </div>
       </header>
+
+      {/* Mobile backdrop */}
+      <div
+        onClick={close}
+        aria-hidden="true"
+        className={`md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      />
+
+      {/* Mobile slide menu */}
+      <aside
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!menuOpen}
+        className={`mobile-menu md:hidden fixed top-16 right-0 bottom-0 z-50 w-[min(20rem,85vw)] bg-card border-l border-border p-6 overflow-y-auto ${menuOpen ? "open" : ""}`}
+      >
+        <ul className="flex flex-col gap-1 text-lg">
+          {["About", "Skills", "Projects", "Why Me", "Contact"].map((l) => (
+            <li key={l}>
+              <a
+                onClick={close}
+                href={`#${l.toLowerCase().replace(" ", "-")}`}
+                className="block rounded-md px-3 py-3 hover:bg-muted transition"
+              >
+                {l}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a
+          onClick={close}
+          href="#contact"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-3 font-medium text-accent-foreground"
+        >
+          Hire Me
+        </a>
+      </aside>
 
       <main>
         {/* HERO */}
