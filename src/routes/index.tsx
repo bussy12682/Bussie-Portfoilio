@@ -8,21 +8,21 @@ import projectFrontend from "@/assets/project-frontend.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "George Abisola Victor — Fullstack Developer & SEO" },
+      { title: "George Abisola Victor , Fullstack Developer & SEO" },
       {
         name: "description",
         content:
-          "Portfolio of George Abisola Victor — fullstack developer building fast, SEO-optimized web apps with React, Node.js, and technical SEO.",
+          "Portfolio of George Abisola Victor , fullstack developer building fast, SEO-optimized web apps with React, Node.js, and technical SEO.",
       },
       { name: "author", content: "George Abisola Victor" },
       { name: "keywords", content: "Fullstack Developer, SEO Specialist, Web Performance, React, Node.js, Technical SEO, Frontend, Backend, George Abisola Victor" },
-      { property: "og:title", content: "George Abisola Victor — Fullstack Developer & SEO Specialist" },
-      { property: "og:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work — see projects, skills, and case studies." },
+      { property: "og:title", content: "George Abisola Victor , Fullstack Developer & SEO Specialist" },
+      { property: "og:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work , see projects, skills, and case studies." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "George Abisola Victor — Fullstack Developer & SEO Specialist" },
-      { name: "twitter:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work — projects, skills, case studies." },
+      { name: "twitter:title", content: "George Abisola Victor , Fullstack Developer & SEO Specialist" },
+      { name: "twitter:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work , projects, skills, case studies." },
     ],
     links: [{ rel: "canonical", href: "/" }],
     scripts: [
@@ -205,7 +205,7 @@ function Portfolio() {
                 Available for fullstack & SEO roles
               </span>
               <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-balance">
-                George Abisola Victor — Fullstack Developer & SEO Specialist
+                George Abisola Victor , Fullstack Developer & SEO Specialist
               </h1>
               <p className="mt-4 text-lg sm:text-xl text-muted-foreground text-balance">
                 Fullstack Developer{" "}
@@ -278,7 +278,7 @@ function Portfolio() {
                 </h2>
                 <p className="mt-5 text-muted-foreground leading-relaxed">
                   A fullstack developer building web systems that rank, load fast,
-                  and convert — from database to design system.
+                  and convert , from database to design system.
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3 max-w-sm">
                   {[
@@ -306,7 +306,7 @@ function Portfolio() {
                   </p>
                   <p>
                     I combine engineering with content strategy, analytics, and
-                    copywriting — so the sites I build aren&apos;t just well-coded,
+                    copywriting , so the sites I build aren&apos;t just well-coded,
                     they&apos;re discoverable, understandable, and conversion-focused.
                   </p>
                 </div>
@@ -389,7 +389,7 @@ function Portfolio() {
                 </h2>
               </div>
               <p className="text-muted-foreground max-w-sm">
-                Three focus areas — backend logic, SEO growth, and frontend UX —
+                Three focus areas , backend logic, SEO growth, and frontend UX ,
                 shipped end-to-end.
               </p>
             </div>
@@ -456,7 +456,7 @@ function Portfolio() {
               {[
                 {
                   t: "Fullstack execution",
-                  d: "Confident across frontend, backend, APIs, and databases — end-to-end ownership.",
+                  d: "Confident across frontend, backend, APIs, and databases , end-to-end ownership.",
                 },
                 {
                   t: "SEO-first thinking",

@@ -1,6 +1,6 @@
 # George Abisola Victor
 
-> Portfolio of George Abisola Victor — fullstack developer specializing in SEO, web performance, and React/Node.js.
+> Portfolio of George Abisola Victor , fullstack developer specializing in SEO, web performance, and React/Node.js.
 
 ## Pages
 
