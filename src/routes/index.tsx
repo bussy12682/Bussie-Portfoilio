@@ -205,7 +205,7 @@ function Portfolio() {
                 Available for fullstack & SEO roles
               </span>
               <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-balance">
-                George Abisola Victor
+                George Abisola Victor — Fullstack Developer & SEO Specialist
               </h1>
               <p className="mt-4 text-lg sm:text-xl text-muted-foreground text-balance">
                 Fullstack Developer{" "}
