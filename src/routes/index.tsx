@@ -253,6 +253,8 @@ function Portfolio() {
                   alt="Portrait of George Abisola Victor, fullstack developer"
                   width={480}
                   height={480}
+                  fetchPriority="high"
+                  decoding="async"
                   className="rounded-2xl w-72 sm:w-80 md:w-96 h-auto object-cover"
                 />
                 <div className="absolute -bottom-4 -left-4 rounded-xl border border-border bg-background px-3 py-2 text-xs shadow-card">
