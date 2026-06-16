@@ -8,21 +8,21 @@ import projectFrontend from "@/assets/project-frontend.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "George Abisola Victor | Fullstack Developer | SEO & Web Performance Specialist" },
+      { title: "George Abisola Victor — Fullstack Developer & SEO" },
       {
         name: "description",
         content:
-          "George Abisola Victor builds high-performance, SEO-optimized fullstack web applications. Frontend, backend, technical SEO, and performance engineering for real-world results.",
+          "Portfolio of George Abisola Victor — fullstack developer building fast, SEO-optimized web apps with React, Node.js, and technical SEO.",
       },
       { name: "author", content: "George Abisola Victor" },
       { name: "keywords", content: "Fullstack Developer, SEO Specialist, Web Performance, React, Node.js, Technical SEO, Frontend, Backend, George Abisola Victor" },
       { property: "og:title", content: "George Abisola Victor — Fullstack Developer & SEO Specialist" },
-      { property: "og:description", content: "Fullstack development, SEO, and web performance engineering portfolio." },
+      { property: "og:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work — see projects, skills, and case studies." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "George Abisola Victor — Fullstack Developer & SEO Specialist" },
-      { name: "twitter:description", content: "Fullstack development, SEO, and web performance engineering portfolio." },
+      { name: "twitter:description", content: "Fullstack engineering, technical SEO, and Core Web Vitals work — projects, skills, case studies." },
     ],
     links: [{ rel: "canonical", href: "/" }],
     scripts: [
