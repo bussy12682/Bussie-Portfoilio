@@ -32,26 +32,26 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  /* Dark SaaS palette — strict */
-  --background: #0B0F1A;
+  --radius: 0.875rem;
+  /* Premium dark SaaS palette - electric blue */
+  --background: #07090F;
   --foreground: #E6EAF2;
-  --surface: #111827;
-  --card: #151C2C;
+  --surface: #0E1322;
+  --card: #0F1626;
   --card-foreground: #E6EAF2;
-  --popover: #151C2C;
+  --popover: #0F1626;
   --popover-foreground: #E6EAF2;
-  --primary: #4DA3FF;
-  --primary-foreground: #0B0F1A;
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
   --secondary: #111827;
   --secondary-foreground: #E6EAF2;
   --muted: #111827;
-  --muted-foreground: #9CA3AF;
-  --accent: #4DA3FF;
-  --accent-foreground: #0B0F1A;
+  --muted-foreground: #94A3B8;
+  --accent: #2563EB;
+  --accent-foreground: #FFFFFF;
   --border: rgba(230, 234, 242, 0.08);
   --input: rgba(230, 234, 242, 0.1);
-  --ring: #4DA3FF;
+  --ring: #2563EB;
 }
 
 @layer base {
@@ -69,20 +69,54 @@
 @layer utilities {
   .text-balance { text-wrap: balance; }
   .glow-accent {
-    box-shadow: 0 0 0 1px rgba(77, 163, 255, 0.25), 0 0 40px -10px rgba(77, 163, 255, 0.55);
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4), 0 0 50px -8px rgba(37, 99, 235, 0.7);
+  }
+  .shadow-glow {
+    box-shadow: 0 0 30px -5px rgba(37, 99, 235, 0.6);
   }
   .grid-bg {
     background-image:
-      radial-gradient(circle at 20% 0%, rgba(77,163,255,0.10), transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(77,163,255,0.06), transparent 50%);
+      linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px),
+      radial-gradient(circle at 20% 0%, rgba(37,99,235,0.12), transparent 55%),
+      radial-gradient(circle at 80% 80%, rgba(30,64,175,0.10), transparent 55%);
+    background-size: 60px 60px, 60px 60px, auto, auto;
+  }
+  .glass {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px) saturate(140%);
   }
   .card-hover {
     transition: transform 300ms cubic-bezier(.2,.7,.2,1), box-shadow 300ms, border-color 300ms;
   }
   .card-hover:hover {
     transform: translateY(-4px);
-    border-color: rgba(77, 163, 255, 0.4);
-    box-shadow: 0 20px 40px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(77,163,255,0.15);
+    border-color: rgba(37, 99, 235, 0.45);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(37,99,235,0.2);
+  }
+  .btn-accent {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.7rem 1.25rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.9rem;
+    background: linear-gradient(135deg, #2563EB, #1e40af);
+    color: #fff; transition: transform .2s, box-shadow .2s, filter .2s;
+  }
+  .btn-accent:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 10px 30px -10px rgba(37,99,235,0.7); }
+  .btn-outline {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.7rem 1.25rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.15); color: var(--foreground);
+    background: rgba(255,255,255,0.02);
+    transition: border-color .2s, background .2s;
+  }
+  .btn-outline:hover { border-color: rgba(37,99,235,0.5); background: rgba(37,99,235,0.08); }
+  .eyebrow {
+    display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600;
+  }
+  .h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem); line-height: 1.1; font-weight: 700; letter-spacing: -0.02em;
+    margin-top: 0.75rem;
   }
 }
 
@@ -112,8 +146,8 @@
 .hb.open .hb-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(77,163,255,0.45); }
-  70% { box-shadow: 0 0 0 14px rgba(77,163,255,0); }
-  100% { box-shadow: 0 0 0 0 rgba(77,163,255,0); }
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.45); }
+  70% { box-shadow: 0 0 0 14px rgba(37,99,235,0); }
+  100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
 }
 .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
