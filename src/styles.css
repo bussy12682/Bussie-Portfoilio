@@ -32,26 +32,26 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  /* Dark SaaS palette — strict */
-  --background: #0B0F1A;
+  --radius: 0.875rem;
+  /* Premium dark SaaS palette - electric blue */
+  --background: #07090F;
   --foreground: #E6EAF2;
-  --surface: #111827;
-  --card: #151C2C;
+  --surface: #0E1322;
+  --card: #0F1626;
   --card-foreground: #E6EAF2;
-  --popover: #151C2C;
+  --popover: #0F1626;
   --popover-foreground: #E6EAF2;
-  --primary: #4DA3FF;
-  --primary-foreground: #0B0F1A;
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
   --secondary: #111827;
   --secondary-foreground: #E6EAF2;
   --muted: #111827;
-  --muted-foreground: #9CA3AF;
-  --accent: #4DA3FF;
-  --accent-foreground: #0B0F1A;
+  --muted-foreground: #94A3B8;
+  --accent: #2563EB;
+  --accent-foreground: #FFFFFF;
   --border: rgba(230, 234, 242, 0.08);
   --input: rgba(230, 234, 242, 0.1);
-  --ring: #4DA3FF;
+  --ring: #2563EB;
 }
 
 @layer base {
