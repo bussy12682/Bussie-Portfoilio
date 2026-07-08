@@ -77,6 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification",content: "Jlg766twGXnLDD55RDUbH7bUt8MBC_gAxWxPn2lMwSc",},
       { title: "George Abisola Victor , Portfolio" },
       { name: "description", content: "Portfolio of George Abisola Victor , fullstack developer specializing in SEO, web performance, and React/Node.js." },
       { name: "author", content: "George Abisola Victor" },
