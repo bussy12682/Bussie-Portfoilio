@@ -16,42 +16,62 @@ const projects = [
   {
     title: "Auth & API Platform",
     tag: "Backend",
-    description: "JWT-based authentication system with role-based access, REST API endpoints, PostgreSQL persistence, rate limiting, and audit logging. Built with Node.js and Express.",
+    description:
+      "JWT-based authentication system with role-based access, REST API endpoints, PostgreSQL persistence, rate limiting, and audit logging. Built with Node.js and Express.",
     stack: ["Node.js", "Express", "PostgreSQL", "JWT", "Zod"],
     image: "./assets/project-backend.jpg",
   },
   {
     title: "SEO Growth Engine",
     tag: "SEO",
-    description: "SEO-optimized content site with keyword-mapped URL structure, structured data, optimized metadata, image lazy-loading, and Core Web Vitals tuned to 95+ Lighthouse.",
+    description:
+      "SEO-optimized content site with keyword-mapped URL structure, structured data, optimized metadata, image lazy-loading, and Core Web Vitals tuned to 95+ Lighthouse.",
     stack: ["Next.js", "Schema.org", "Sitemap", "GA4", "Search Console"],
     image: "./assets/project-seo.jpg",
   },
   {
     title: "SaaS Dashboard UI",
     tag: "Frontend",
-    description: "Responsive analytics dashboard with accessible components, dark theme system, smooth transitions, and an opinionated design system built on React and Tailwind.",
+    description:
+      "Responsive analytics dashboard with accessible components, dark theme system, smooth transitions, and an opinionated design system built on React and Tailwind.",
     stack: ["React", "TypeScript", "Tailwind", "Recharts"],
     image: "./assets/project-frontend.jpg",
   },
 ];
 
 const whyCards = [
-  { t: "Fullstack execution", d: "Confident across frontend, backend, APIs, and databases , end-to-end ownership." },
-  { t: "SEO-first thinking", d: "Technical SEO, metadata, schema, and content structure built in, not bolted on." },
-  { t: "Performance engineering", d: "Core Web Vitals, lazy-loading, caching, and rendering strategies that ship 90+ scores." },
-  { t: "Business outcomes", d: "Analytics, copy, and UX aligned to turn traffic into real-world results." },
+  {
+    t: "Fullstack execution",
+    d: "Confident across frontend, backend, APIs, and databases , end-to-end ownership.",
+  },
+  {
+    t: "SEO-first thinking",
+    d: "Technical SEO, metadata, schema, and content structure built in, not bolted on.",
+  },
+  {
+    t: "Performance engineering",
+    d: "Core Web Vitals, lazy-loading, caching, and rendering strategies that ship 90+ scores.",
+  },
+  {
+    t: "Business outcomes",
+    d: "Analytics, copy, and UX aligned to turn traffic into real-world results.",
+  },
 ];
 
 // ===== Render dynamic sections =====
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const esc = (s) =>
+  String(s).replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+  );
 
 document.getElementById("skillGrid").innerHTML = skills
   .map((s, i) => `<li class="skill reveal" style="transition-delay:${i * 40}ms">${esc(s)}</li>`)
   .join("");
 
 document.getElementById("projectGrid").innerHTML = projects
-  .map((p, i) => `
+  .map(
+    (p, i) => `
     <article class="project reveal" style="transition-delay:${i * 100}ms">
       <div class="thumb">
         <img src="${p.image}" alt="${esc(p.title)}, ${esc(p.tag)} project preview" loading="lazy" width="1280" height="800" />
@@ -67,7 +87,9 @@ document.getElementById("projectGrid").innerHTML = projects
         </ul>
       </div>
     </article>
-  `).join("");
+  `,
+  )
+  .join("");
 
 document.getElementById("whyCards").innerHTML = whyCards
   .map((c) => `<div class="why-card"><h3>${esc(c.t)}</h3><p>${esc(c.d)}</p></div>`)
@@ -76,14 +98,17 @@ document.getElementById("whyCards").innerHTML = whyCards
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // ===== Reveal on scroll =====
-const io = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (e.isIntersecting) {
-      e.target.classList.add("in-view");
-      io.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.15 });
+const io = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add("in-view");
+        io.unobserve(e.target);
+      }
+    });
+  },
+  { threshold: 0.15 },
+);
 document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 
 // ===== Mobile menu =====

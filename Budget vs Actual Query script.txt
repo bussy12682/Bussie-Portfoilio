@@ -1,0 +1,203 @@
+-- Study Data set
+SELECT * FROM budgetvsactual
+
+-- Finding missing rows in data set
+SELECT
+    SUM(CASE WHEN Date IS NULL OR TRIM(Date) = '' THEN 1 ELSE 0 END) AS missing_date,
+    SUM(CASE WHEN Department IS NULL OR TRIM(Department) = '' THEN 1 ELSE 0 END) AS missing_department,
+    SUM(CASE WHEN Category IS NULL OR TRIM(Category) = '' THEN 1 ELSE 0 END) AS missing_category,
+    SUM(CASE WHEN Region IS NULL OR TRIM(Region) = '' THEN 1 ELSE 0 END) AS missing_region,
+    SUM(CASE WHEN Budget_Amount IS NULL OR TRIM(Budget_Amount) = '' THEN 1 ELSE 0 END) AS missing_budget,
+    SUM(CASE WHEN Actual_Amount IS NULL OR TRIM(Actual_Amount) = '' THEN 1 ELSE 0 END) AS missing_actual,
+    SUM(CASE WHEN Payment_Method IS NULL OR TRIM(Payment_Method) = '' THEN 1 ELSE 0 END) AS missing_payment_method,
+    SUM(CASE WHEN Transaction_ID IS NULL OR TRIM(Transaction_ID) = '' THEN 1 ELSE 0 END) AS missing_transaction_id,
+FROM budgetvsactual;
+
+-- Individual column confirmation of missing data
+SELECT *
+FROM budgetvsactual
+WHERE Department IS NULL
+   OR TRIM(Department) = '';
+   
+-- Renamed Colum name for easier qeurying
+ALTER TABLE financial_data
+RENAME COLUMN `Budget Amount` TO Budget_Amount,
+RENAME COLUMN `Budget Amount` TO Budget_Amount,
+RENAME COLUMN `Payment Method` TO Payment_Method,
+RENAME COLUMN `Transaction ID` TO Transaction_ID;
+
+-- Updated missing values with Unknow
+UPDATE budgetvsactual
+SET Region = 'Unknown'
+WHERE Region IS NULL OR TRIM(Region) = '';
+
+UPDATE budgetvsactual
+SET Department = 'Unknown'
+WHERE Department IS NULL OR TRIM(Department) = '';
+
+UPDATE budgetvsactual
+SET Category = 'Unknown'
+WHERE Category IS NULL OR TRIM(Category) = '';
+
+UPDATE budgetvsactual
+SET transaction_id = 'Unknown'
+WHERE Transaction_id IS NULL OR TRIM(transaction_id) = '';
+
+-- Confirmation of missing data set to unknown
+SELECT *
+FROM budgetvsactual
+WHERE Department = 'Unknown'
+   OR Category = 'Unknown'
+   OR Region = 'Unknown'
+   OR Transaction_id = 'Unknown';
+   
+-- Search for Duplicates
+SELECT
+    Transaction_id,
+    COUNT(*) AS occurrence
+FROM budgetvsactual
+WHERE Transaction_ID IS NOT NULL
+GROUP BY Transaction_ID
+HAVING COUNT(*) > 1;
+
+-- Inspect the actual duplicate rows
+SELECT *
+FROM budgetvsactual
+WHERE Transaction_ID IN (
+    'TXN101933',
+    'TXN101989',
+    'TXN102041',
+    'TXN103850',
+    'TXN103886',
+    'TXN104962',
+    'TXN105437',
+    'TXN108517',
+    'TXN109953',
+    'TXN109984'
+)
+ORDER BY Transaction_ID, Date;
+
+-- Remove duplicate - create a clean table containing distinct records
+CREATE TABLE budgetvsactual_clean AS
+SELECT DISTINCT *
+FROM budgetvsactual;
+
+-- Confirm row count
+SELECT COUNT(*) AS total_rows
+FROM budgetvsactual_clean;
+
+-- Understand updated datset
+SELECT *
+FROM budgetvsactual_clean
+LIMIT 10;
+
+SELECT
+    MIN(Date) AS earliest_date,
+    MAX(Date) AS latest_date,
+    COUNT(*) AS total_records
+FROM budgetvsactual_clean;
+
+SELECT Department, COUNT(*) AS transactions
+FROM budgetvsactual_clean
+GROUP BY Department
+ORDER BY transactions DESC;
+
+SELECT Payment_Method, COUNT(*) AS transactions
+FROM budgetvsactual_clean
+GROUP BY Payment_Method
+ORDER BY transactions DESC;
+
+-- Q1 - Are we spending within budget, and how is our budget performance changing over time
+SELECT
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND(
+        (SUM(Budget_Amount) - SUM(Actual_Amount))
+        / NULLIF(SUM(Budget_Amount), 0) * 100,
+        2
+    ) AS variance_pct
+FROM budgetvsactual_clean;
+
+-- Performance over time (monthly)
+SELECT YEAR(Date) AS year, MONTH(Date) AS month,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+GROUP BY YEAR(Date), MONTH(Date)
+ORDER BY year, month;
+
+-- Performance over time (yearly)
+SELECT YEAR(Date) AS year,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+GROUP BY YEAR(Date)
+ORDER BY year;
+
+-- Okay, but when exactly did we spend significantly more than planned?
+SELECT YEAR(Date) AS year, MONTH(Date) AS month,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance
+FROM budgetvsactual_clean
+GROUP BY YEAR(Date), MONTH(Date)
+ORDER BY variance ASC
+LIMIT 5;
+
+-- Q2 - Which department are over spending and underspending?
+SELECT Department,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+GROUP BY Department
+ORDER BY variance ASC;
+
+-- Did the same departments drive the overspending every year, or did the problem shift between departments?
+SELECT YEAR(Date) AS year, Department,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+WHERE Department <> 'Unknown'
+GROUP BY YEAR(Date), Department
+ORDER BY year, variance ASC;
+
+-- Q3 - Which expense categories are contributing most to overspending?
+SELECT Category,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+WHERE Category <> 'Unknown'
+GROUP BY Category
+ORDER BY variance ASC;
+
+-- Which departments are responsible for these high-cost categories?
+SELECT Department, Category,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance
+FROM budgetvsactual_clean
+WHERE Department <> 'Unknown' AND Category <> 'Unknown'
+GROUP BY Department, Category
+ORDER BY variance ASC;
+
+-- Q4 - Which regions have the best and worst budget performance?
+SELECT Region,
+    SUM(Budget_Amount) AS total_budget,
+    SUM(Actual_Amount) AS total_actual,
+    SUM(Budget_Amount) - SUM(Actual_Amount) AS variance,
+    ROUND((SUM(Budget_Amount) - SUM(Actual_Amount)) / NULLIF(SUM(Budget_Amount), 0) * 100, 2) AS variance_pct
+FROM budgetvsactual_clean
+WHERE Region <> 'Unknown'
+GROUP BY Region
+ORDER BY variance ASC;

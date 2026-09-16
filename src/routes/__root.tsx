@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -38,7 +37,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    console.error(error);
   }, [error]);
 
   return (
@@ -77,19 +76,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "google-site-verification",content: "Jlg766twGXnLDD55RDUbH7bUt8MBC_gAxWxPn2lMwSc",},
-      { title: "George Abisola Victor , Portfolio" },
-      { name: "description", content: "Portfolio of George Abisola Victor , fullstack developer specializing in SEO, web performance, and React/Node.js." },
-      { name: "author", content: "George Abisola Victor" },
-      { property: "og:title", content: "George Abisola Victor , Fullstack Developer & SEO Specialist" },
-      { property: "og:description", content: "Portfolio of George Abisola Victor , fullstack developer specializing in SEO, web performance, and React/Node.js." },
+      { name: "google-site-verification", content: "Jlg766twGXnLDD55RDUbH7bUt8MBC_gAxWxPn2lMwSc" },
+      { title: "Busayo Omoniyi portfolio" },
+      {
+        name: "description",
+        content:
+          "Portfolio of Busayo Omoniyi, data analyst specializing in SQL, Power BI, Excel, and business analytics.",
+      },
+      { name: "author", content: "Busayo Omoniyi" },
+      {
+        property: "og:title",
+        content: "Busayo Omoniyi portfolio",
+      },
+      {
+        property: "og:description",
+        content:
+          "Portfolio of Busayo Omoniyi, data analyst specializing in SQL, Power BI, Excel, and business analytics.",
+      },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "George Abisola Victor" },
+      { property: "og:site_name", content: "Busayo Omoniyi portfolio" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "George Abisola Victor , Fullstack Developer & SEO Specialist" },
-      { name: "twitter:description", content: "Portfolio of George Abisola Victor , fullstack developer specializing in SEO, web performance, and React/Node.js." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d5a4b9d2-2942-48d7-9ce4-ff0eaba78eda/id-preview-0d820de4--55f5ebb2-8617-4158-b4f0-5b32d798f560.lovable.app-1781517562067.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d5a4b9d2-2942-48d7-9ce4-ff0eaba78eda/id-preview-0d820de4--55f5ebb2-8617-4158-b4f0-5b32d798f560.lovable.app-1781517562067.png" },
+      {
+        name: "twitter:title",
+        content: "Busayo Omoniyi portfolio",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Portfolio of Busayo Omoniyi, data analyst specializing in SQL, Power BI, Excel, and business analytics.",
+      },
+      { property: "og:image", content: "" },
+      { name: "twitter:image", content: "" },
     ],
     links: [
       {

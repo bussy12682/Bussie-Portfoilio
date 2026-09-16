@@ -9,55 +9,83 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BudgetVsActualFinanceAnalysisRouteImport } from './routes/budget-vs-actual-finance-analysis'
+import { Route as GlobalSuperstorePerformanceAnalyticsRouteImport } from './routes/global-superstore-performance-analytics'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BudgetVsActualFinanceAnalysisRoute =
+  BudgetVsActualFinanceAnalysisRouteImport.update({
+    id: '/budget-vs-actual-finance-analysis',
+    path: '/budget-vs-actual-finance-analysis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GlobalSuperstorePerformanceAnalyticsRoute =
+  GlobalSuperstorePerformanceAnalyticsRouteImport.update({
+    id: '/global-superstore-performance-analytics',
+    path: '/global-superstore-performance-analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/budget-vs-actual-finance-analysis': typeof BudgetVsActualFinanceAnalysisRoute
+  '/global-superstore-performance-analytics': typeof GlobalSuperstorePerformanceAnalyticsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/budget-vs-actual-finance-analysis': typeof BudgetVsActualFinanceAnalysisRoute
+  '/global-superstore-performance-analytics': typeof GlobalSuperstorePerformanceAnalyticsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/budget-vs-actual-finance-analysis': typeof BudgetVsActualFinanceAnalysisRoute
+  '/global-superstore-performance-analytics': typeof GlobalSuperstorePerformanceAnalyticsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/budget-vs-actual-finance-analysis'
+    | '/global-superstore-performance-analytics'
+    | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml'
-  id: '__root__' | '/' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/budget-vs-actual-finance-analysis'
+    | '/global-superstore-performance-analytics'
+    | '/sitemap.xml'
+  id:
+    | '__root__'
+    | '/'
+    | '/budget-vs-actual-finance-analysis'
+    | '/global-superstore-performance-analytics'
+    | '/sitemap.xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BudgetVsActualFinanceAnalysisRoute: typeof BudgetVsActualFinanceAnalysisRoute
+  GlobalSuperstorePerformanceAnalyticsRoute: typeof GlobalSuperstorePerformanceAnalyticsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -65,13 +93,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/budget-vs-actual-finance-analysis': {
+      id: '/budget-vs-actual-finance-analysis'
+      path: '/budget-vs-actual-finance-analysis'
+      fullPath: '/budget-vs-actual-finance-analysis'
+      preLoaderRoute: typeof BudgetVsActualFinanceAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/global-superstore-performance-analytics': {
+      id: '/global-superstore-performance-analytics'
+      path: '/global-superstore-performance-analytics'
+      fullPath: '/global-superstore-performance-analytics'
+      preLoaderRoute: typeof GlobalSuperstorePerformanceAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BudgetVsActualFinanceAnalysisRoute: BudgetVsActualFinanceAnalysisRoute,
+  GlobalSuperstorePerformanceAnalyticsRoute:
+    GlobalSuperstorePerformanceAnalyticsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

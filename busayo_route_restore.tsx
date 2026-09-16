@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import profileImg from "@/assets/profile.jpg";
-import projectSeo from "../../pic pic 1.jpeg";
-import projectBackend from "../../pic pic 2.jpeg";
+import projectSeo from "@/assets/project-seo.jpg";
+import projectBackend from "@/assets/project-backend.jpg";
 
 type ProjectTab = "caseStudy" | "dashboard" | "sqlQuery";
 
@@ -126,7 +126,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Page() {
-  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectTab, setProjectTab] = useState<ProjectTab>("caseStudy");
@@ -168,7 +167,10 @@ function Page() {
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/60 border-b border-white/5">
         <nav className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#home" className="flex items-center gap-2 font-semibold">
-            <span>Busayo Omoniyi | Data Analyst</span>
+            <span className="h-8 w-8 rounded-lg grid place-items-center bg-gradient-to-br from-accent to-[#1e40af] text-white shadow-glow">
+              B
+            </span>
+            <span>Busayo Analytics</span>
           </a>
           <ul className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
             {[
@@ -325,16 +327,6 @@ function Page() {
                     type="button"
                     className="text-left"
                     onClick={() => {
-                      if (project.name === "Budget vs Actual Financial Analysis") {
-                        navigate({ to: "/budget-vs-actual-finance-analysis" });
-                        return;
-                      }
-
-                      if (project.name === "Global Superstore performance Analytics") {
-                        navigate({ to: "/global-superstore-performance-analytics" });
-                        return;
-                      }
-
                       setSelectedProject(project.name);
                       setProjectTab("caseStudy");
                     }}
@@ -381,27 +373,22 @@ function Page() {
         {selectedProjectData && (
           <section id="project-detail" className="relative">
             <div className="relative max-w-5xl mx-auto px-5 sm:px-8">
-              <div className="glass rounded-3xl p-8">
-                <div className="flex flex-col gap-4">
+              <div className="reveal glass rounded-3xl p-8">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="eyebrow">Project</p>
+                    <h2 className="h2 mt-2">{selectedProjectData.name}</h2>
+                  </div>
                   <button
                     type="button"
-                    className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10"
+                    className="btn-outline"
                     onClick={() => {
                       setSelectedProject(null);
                       setProjectTab("caseStudy");
                     }}
-                    aria-label="Back to portfolio"
-                    title="Back to Portfolio"
                   >
-                    <span aria-hidden="true">←</span>
+                    Back to Portfolio
                   </button>
-
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="eyebrow">Project</p>
-                      <h2 className="h2 mt-2">{selectedProjectData.name}</h2>
-                    </div>
-                  </div>
                 </div>
 
                 <nav className="mt-8 flex flex-wrap gap-3 border-b border-white/10 pb-4">
@@ -504,7 +491,7 @@ function Page() {
                 question.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                {["SQL", "Power BI", "Excel", "Python"].map((tool) => (
+                {"SQL", "Power BI", "Excel", "Python"}.split(",").map((tool) => (
                   <span
                     key={tool}
                     className="rounded-full border border-white/10 px-3 py-2 text-xs text-muted-foreground"
@@ -538,7 +525,7 @@ function Page() {
 
             {contactCardOpen && (
               <div className="fixed inset-0 z-[80] grid place-items-center bg-black/60 backdrop-blur-sm p-4">
-                <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-card p-6 shadow-2xl">
+                <div className="w-full max-w-md rounded-3xl border border-white/10 bg-card p-6 shadow-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="eyebrow">Hire Me</p>
@@ -557,15 +544,15 @@ function Page() {
                   <div className="mt-6 space-y-3 text-left">
                     <div className="glass rounded-2xl p-4">
                       <p className="text-xs uppercase tracking-wider text-muted-foreground">Email</p>
-                      <a href="mailto:hi.busayoniyi@gmail.com" className="mt-1 block text-sm font-semibold text-foreground hover:text-accent">
-                        hi.busayoniyi@gmail.com
+                      <a href="mailto:busayoniyi@gmail.com" className="mt-1 block text-sm font-semibold text-foreground hover:text-accent">
+                        busayoniyi@gmail.com
                       </a>
                     </div>
 
                     <div className="glass rounded-2xl p-4">
                       <p className="text-xs uppercase tracking-wider text-muted-foreground">WhatsApp</p>
                       <a href="https://wa.me/2349052470512" target="_blank" rel="noreferrer" className="mt-1 block text-sm font-semibold text-foreground hover:text-accent">
-                        +2349052470512
+                        09052470512
                       </a>
                     </div>
 
@@ -581,17 +568,6 @@ function Page() {
                       <a href="https://linkedin.com/in/busayo-omoniyi" target="_blank" rel="noreferrer" className="mt-1 block text-sm font-semibold text-foreground hover:text-accent">
                         linkedin.com/in/busayo-omoniyi
                       </a>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        className="rounded-full border border-red-500/70 bg-red-600/90 px-3 py-1 text-[11px] font-semibold text-white hover:bg-red-500"
-                        onClick={() => setContactCardOpen(false)}
-                        aria-label="Close contact card"
-                      >
-                        Close
-                      </button>
                     </div>
                   </div>
                 </div>
