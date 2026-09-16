@@ -263,7 +263,7 @@ function Page() {
                 information for decision-making. Simply, I turn business data into insights that
                 make performance easier to understand and decisions easier to make.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mobile-cta mt-8 flex flex-wrap gap-3">
                 <a href="#portfolio" className="btn-accent glow-accent">
                   View Portfolio
                 </a>
@@ -352,12 +352,12 @@ function Page() {
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="flex items-center justify-between gap-3">
-                        <h3 className="text-lg font-semibold">{project.name}</h3>
+                        <h3 className="project-title text-lg font-semibold">{project.name}</h3>
                         <span className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full bg-accent/15 text-accent border border-accent/30">
                           Analytics
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-muted-foreground">{project.summary}</p>
+                      <p className="project-summary mt-2 text-sm text-muted-foreground">{project.summary}</p>
                       <div className="mt-5 flex flex-wrap gap-2">
                         {project.tools.map((tool) => (
                           <span
@@ -528,7 +528,7 @@ function Page() {
               I transform business data into practical insight for clearer decisions and stronger
               performance.
             </p>
-            <div className="mt-9 flex flex-wrap justify-center gap-3 reveal">
+            <div className="mobile-cta mt-9 flex flex-wrap justify-center gap-3 reveal">
               <button type="button" className="btn-accent glow-accent" onClick={() => setContactCardOpen(true)}>
                 Hire Me
               </button>

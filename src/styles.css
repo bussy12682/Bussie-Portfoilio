@@ -62,7 +62,11 @@
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
+  img, svg { display: block; max-width: 100%; height: auto; }
+  a, button { -webkit-tap-highlight-color: transparent; }
+  section { scroll-margin-top: 88px; }
   ::selection { background: var(--accent); color: var(--accent-foreground); }
 }
 
@@ -153,15 +157,51 @@
   padding-top: 7rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   #home {
-    padding-top: 6.5rem;
-    padding-bottom: 4rem;
+    padding-top: 5.75rem;
+    padding-bottom: 3.5rem;
   }
 
   #about,
   #contact {
     padding-top: 4.5rem;
+  }
+
+  .relative.max-w-7xl.mx-auto.px-5.sm\:px-8.grid.lg\:grid-cols-\[1\.2fr_1fr\].gap-14.items-center {
+    gap: 2.5rem;
+  }
+
+  .project-title {
+    font-size: 1rem;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .project-summary {
+    font-size: 0.81rem;
+    line-height: 1.6;
+  }
+
+  .mobile-cta {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .mobile-cta > * {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  header nav {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+    height: 4rem;
+  }
+
+  header nav a {
+    font-size: 0.8rem;
   }
 
   .btn-accent,
@@ -194,17 +234,33 @@
     background-size: 40px 40px, 40px 40px, auto, auto;
   }
 
+  #home h1 {
+    font-size: clamp(2.2rem, 11vw, 3.1rem);
+    letter-spacing: -0.04em;
+  }
+
+  #home p {
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
   .h2 {
     font-size: clamp(1.5rem, 8vw, 2.1rem);
   }
 
-  .mt-9.flex.flex-wrap.justify-center.gap-3 {
-    flex-direction: column;
+  #about p,
+  #contact p,
+  #portfolio p {
+    word-break: break-word;
   }
 
-  .btn-accent,
-  .btn-outline {
-    width: 100%;
+  #project-detail pre {
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .glass.rounded-xl {
+    padding: 0.7rem 0.8rem;
   }
 }
 
