@@ -303,9 +303,9 @@ function BudgetVsActualFinanceAnalysisPage() {
         </nav>
       </header>
 
-      <main className="pt-28 pb-16">
-        <section className="relative max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="mb-8">
+      <main id="project-detail" className="pt-28 pb-16">
+        <section className="relative mx-auto max-w-6xl px-0 sm:px-8">
+          <div className="mb-8 px-5 sm:px-0">
             <a href="/" className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10" aria-label="Back to portfolio" title="Back to Portfolio">
               <span aria-hidden="true">←</span>
             </a>

@@ -246,7 +246,14 @@
   }
 
   #project-detail .glass {
-    padding: 1.25rem;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  #project-detail .case-study-viewer {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
   }
 
   .fixed.left-4.top-20 {
