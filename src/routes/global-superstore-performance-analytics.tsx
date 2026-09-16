@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import JSZip from "jszip";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import globalSuperstoreCaseStudyPdfUrl from "../../global superstore case study.pdf?url";
 import dashboardAssetUrl from "../../global superstore dashboard.pptx?url";
 import sqlScript from "../../global superstore script.txt?raw";
@@ -15,75 +13,27 @@ type SlideAsset = {
   images?: string[];
 };
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-
 function GlobalSuperstoreCaseStudyPdf() {
-  const [pageImages, setPageImages] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function renderPdf() {
-      const pdfDocument = await pdfjsLib.getDocument({
-        url: globalSuperstoreCaseStudyPdfUrl,
-      }).promise;
-      const images: string[] = [];
-
-      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
-        const page = await pdfDocument.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.35 });
-        const canvas = window.document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        if (!context) {
-          continue;
-        }
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: context, viewport }).promise;
-        images.push(canvas.toDataURL("image/png"));
-      }
-
-      if (!cancelled) {
-        setPageImages(images);
-      }
-    }
-
-    renderPdf().catch((renderError) => {
-      console.error("Unable to render Global Superstore case study PDF", renderError);
-      if (!cancelled) {
-        setError("Unable to load the case study PDF.");
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (error) {
-    return <div className="p-8 text-center text-sm text-red-300">{error}</div>;
-  }
-
-  if (pageImages.length === 0) {
-    return <div className="p-8 text-center text-sm text-white/70">Loading case study…</div>;
-  }
-
   return (
-    <div className="max-h-[calc(100vh-12rem)] min-h-[720px] overflow-y-auto overflow-x-hidden bg-black [touch-action:none]">
-      {pageImages.map((image, pageIndex) => (
-        <div key={`global-superstore-case-study-page-${pageIndex}`} className="mx-auto w-fit max-w-full bg-white">
-          <img
-            src={image}
-            alt={`Global Superstore case study page ${pageIndex + 1}`}
-            aria-label={`Global Superstore case study page ${pageIndex + 1}`}
-            draggable={false}
-            className="pointer-events-none block h-auto max-w-full select-none"
-          />
-        </div>
-      ))}
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/80">
+        <iframe
+          src={globalSuperstoreCaseStudyPdfUrl}
+          title="Global Superstore case study PDF"
+          className="h-[72vh] min-h-[560px] w-full bg-white"
+        />
+      </div>
+
+      <div className="flex justify-end">
+        <a
+          href={globalSuperstoreCaseStudyPdfUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/20"
+        >
+          Open PDF in new tab
+        </a>
+      </div>
     </div>
   );
 }

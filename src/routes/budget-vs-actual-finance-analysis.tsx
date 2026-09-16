@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import JSZip from "jszip";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import caseStudyPdfUrl from "../../budget vs finance case study.pdf?url";
 import dashboardAssetUrl from "../../budget vs finance dashbaord.pptx?url";
 import sqlScript from "../../Budget vs Actual Query script.txt?raw";
@@ -15,76 +13,27 @@ type SlideAsset = {
   images?: string[];
 };
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-
 function CaseStudyPdf() {
-  const [pageImages, setPageImages] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function renderPdf() {
-      const pdfDocument = await pdfjsLib.getDocument({
-        url: caseStudyPdfUrl,
-        disableWorker: true,
-      }).promise;
-      const images: string[] = [];
-
-      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
-        const page = await pdfDocument.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.35 });
-        const canvas = window.document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        if (!context) {
-          continue;
-        }
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: context, viewport }).promise;
-        images.push(canvas.toDataURL("image/png"));
-      }
-
-      if (!cancelled) {
-        setPageImages(images);
-      }
-    }
-
-    renderPdf().catch((error) => {
-      console.error("Unable to render case study PDF", error);
-      if (!cancelled) {
-        setError("Unable to load the case study PDF.");
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (error) {
-    return <div className="p-8 text-center text-sm text-red-300">{error}</div>;
-  }
-
-  if (pageImages.length === 0) {
-    return <div className="p-8 text-center text-sm text-white/70">Loading case study…</div>;
-  }
-
   return (
-    <div className="max-h-[calc(100vh-12rem)] min-h-[720px] overflow-y-auto overflow-x-hidden bg-black py-0 [touch-action:none]">
-      {pageImages.map((image, index) => (
-        <div key={`case-study-page-${index}`} className="mx-auto w-fit max-w-full bg-white">
-          <img
-            src={image}
-            aria-label={`Case study page ${index + 1}`}
-            alt={`Case study page ${index + 1}`}
-            draggable={false}
-            className="pointer-events-none block h-auto max-w-full select-none"
-          />
-        </div>
-      ))}
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/80">
+        <iframe
+          src={caseStudyPdfUrl}
+          title="Budget vs Actual case study PDF"
+          className="h-[72vh] min-h-[560px] w-full bg-white"
+        />
+      </div>
+
+      <div className="flex justify-end">
+        <a
+          href={caseStudyPdfUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/20"
+        >
+          Open PDF in new tab
+        </a>
+      </div>
     </div>
   );
 }
