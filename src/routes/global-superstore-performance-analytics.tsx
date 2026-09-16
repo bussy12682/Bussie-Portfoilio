@@ -19,6 +19,7 @@ function GlobalSuperstoreCaseStudyPdf() {
   const [pageCount, setPageCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
+  const pdfDocumentRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,8 +34,26 @@ function GlobalSuperstoreCaseStudyPdf() {
       }).promise;
 
       if (cancelled) return;
+      pdfDocumentRef.current = pdfDocument;
       setPageCount(pdfDocument.numPages);
+    }
 
+    renderPdf().catch((renderError) => {
+      console.error("Unable to load Global Superstore case study PDF", renderError);
+      if (!cancelled) setError("Unable to load the case study PDF.");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pageCount || !pdfDocumentRef.current) return;
+    let cancelled = false;
+
+    async function renderPages() {
+      const pdfDocument = pdfDocumentRef.current;
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
         const page = await pdfDocument.getPage(pageNumber);
         const canvas = canvasRefs.current[pageNumber - 1];
@@ -42,14 +61,14 @@ function GlobalSuperstoreCaseStudyPdf() {
         if (!canvas || !context || cancelled) continue;
 
         const baseViewport = page.getViewport({ scale: 1 });
-        const availableWidth = Math.max(canvas.parentElement?.clientWidth ?? 320, 320);
+        const availableWidth = Math.max(canvas.parentElement?.clientWidth ?? 0, 1);
         const viewport = page.getViewport({ scale: availableWidth / baseViewport.width });
         const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
-        canvas.width = viewport.width * pixelRatio;
-        canvas.height = viewport.height * pixelRatio;
-        canvas.style.width = `${viewport.width}px`;
-        canvas.style.height = `${viewport.height}px`;
+        canvas.width = Math.ceil(viewport.width * pixelRatio);
+        canvas.height = Math.ceil(viewport.height * pixelRatio);
+        canvas.style.width = "100%";
+        canvas.style.height = "auto";
         await page.render({
           canvasContext: context,
           viewport,
@@ -58,15 +77,15 @@ function GlobalSuperstoreCaseStudyPdf() {
       }
     }
 
-    renderPdf().catch((renderError) => {
+    renderPages().catch((renderError) => {
       console.error("Unable to render Global Superstore case study PDF", renderError);
-      if (!cancelled) setError("Unable to load the case study PDF.");
+      if (!cancelled) setError("Unable to render the case study PDF.");
     });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pageCount]);
 
   if (error) {
     return <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">{error}</div>;

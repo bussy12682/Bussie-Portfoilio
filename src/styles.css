@@ -178,7 +178,8 @@
 
 .case-study-page canvas {
   display: block;
-  max-width: 100%;
+  width: 100%;
+  max-width: none;
   height: auto;
   margin: 0 auto;
 }
@@ -304,6 +305,12 @@
 
   .case-study-page {
     border-radius: 0.3rem;
+  }
+
+  #project-detail .case-study-viewer {
+    width: 100vw;
+    max-width: 100vw;
+    padding: 0.35rem;
   }
 }
 
