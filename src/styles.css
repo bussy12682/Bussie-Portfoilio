@@ -157,6 +157,32 @@
   padding-top: 7rem;
 }
 
+.case-study-viewer {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.case-study-page {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+}
+
+.case-study-page canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 @media (max-width: 768px) {
   #home {
     padding-top: 5.75rem;
@@ -261,6 +287,16 @@
 
   .glass.rounded-xl {
     padding: 0.7rem 0.8rem;
+  }
+
+  .case-study-viewer {
+    gap: 0.65rem;
+    border-radius: 0.75rem;
+    padding: 0.45rem;
+  }
+
+  .case-study-page {
+    border-radius: 0.3rem;
   }
 }
 
