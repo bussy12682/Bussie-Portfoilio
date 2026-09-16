@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 import * as pdfjsLib from "pdfjs-dist";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import PdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?worker";
 import caseStudyPdfUrl from "../../budget vs finance case study.pdf?url";
 import dashboardAssetUrl from "../../budget vs finance dashbaord.pptx?url";
 import sqlScript from "../../Budget vs Actual Query script.txt?raw";
@@ -15,8 +15,6 @@ type SlideAsset = {
   images?: string[];
 };
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-
 function CaseStudyPdf() {
   const [pageCount, setPageCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +24,10 @@ function CaseStudyPdf() {
     let cancelled = false;
 
     async function renderPdf() {
+      if (!pdfjsLib.GlobalWorkerOptions.workerPort) {
+        pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
+      }
+
       const pdfDocument = await pdfjsLib.getDocument({
         url: caseStudyPdfUrl,
       }).promise;
