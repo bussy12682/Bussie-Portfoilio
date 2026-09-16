@@ -166,9 +166,10 @@ function Page() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/60 border-b border-white/5">
-        <nav className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <a href="#home" className="flex items-center gap-2 font-semibold">
-            <span>Busayo Omoniyi | Data Analyst</span>
+        <nav className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-3">
+          <a href="#home" className="flex items-center gap-2 font-semibold min-w-0">
+            <span className="truncate text-sm sm:text-base">Busayo Omoniyi</span>
+            <span className="hidden sm:inline text-muted-foreground">| Data Analyst</span>
           </a>
           <ul className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
             {[
