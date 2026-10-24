@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import JSZip from "jszip";
-import * as pdfjsLib from "pdfjs-dist";
+import { ProjectCaseStudyPdf } from "../components/ProjectCaseStudyPdf";
 import caseStudyPdfUrl from "../../budget vs finance case study.pdf?url";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import dashboardAssetUrl from "../../budget vs finance dashbaord.pptx?url";
 import sqlScript from "../../Budget vs Actual Query script.txt?raw";
 
@@ -14,112 +13,6 @@ type SlideAsset = {
   text: string;
   images?: string[];
 };
-
-function CaseStudyPdf() {
-  const [pageCount, setPageCount] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
-  const pdfDocumentRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-    const loadingTask = pdfjsLib.getDocument({ url: caseStudyPdfUrl });
-
-    loadingTask.promise
-      .then((pdfDocument) => {
-        if (cancelled) return;
-        pdfDocumentRef.current = pdfDocument;
-        setPageCount(pdfDocument.numPages);
-      })
-      .catch((loadError: unknown) => {
-        console.error("Unable to load Budget vs Actual case study PDF", loadError);
-        if (!cancelled) setError("Unable to display the case study in this browser.");
-      });
-
-    return () => {
-      cancelled = true;
-      void loadingTask.destroy();
-      pdfDocumentRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!pageCount || !pdfDocumentRef.current) return;
-    let cancelled = false;
-
-    async function renderPages() {
-      const pdfDocument = pdfDocumentRef.current;
-      if (!pdfDocument) return;
-
-      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
-        if (cancelled) return;
-        const page = await pdfDocument.getPage(pageNumber);
-        const canvas = canvasRefs.current[pageNumber - 1];
-        const context = canvas?.getContext("2d");
-        if (!canvas || !context) continue;
-
-        const baseViewport = page.getViewport({ scale: 1 });
-        const availableWidth = Math.max(canvas.parentElement?.clientWidth ?? 0, 1);
-        const viewport = page.getViewport({ scale: availableWidth / baseViewport.width });
-        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-
-        canvas.width = Math.ceil(viewport.width * pixelRatio);
-        canvas.height = Math.ceil(viewport.height * pixelRatio);
-        canvas.style.width = "100%";
-        canvas.style.height = "auto";
-        await page.render({
-          canvasContext: context,
-          viewport,
-          transform: pixelRatio === 1 ? undefined : [pixelRatio, 0, 0, pixelRatio, 0, 0],
-        }).promise;
-      }
-    }
-
-    renderPages().catch((renderError: unknown) => {
-      console.error("Unable to render Budget vs Actual case study PDF", renderError);
-      if (!cancelled) setError("Unable to display the case study in this browser.");
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [pageCount]);
-
-  return (
-    <div className="case-study-viewer">
-      {error ? (
-        <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">
-          <p>{error}</p>
-          <a href={caseStudyPdfUrl} target="_blank" rel="noreferrer" className="btn-outline mt-4">
-            Open case study PDF
-          </a>
-        </div>
-      ) : (
-        <div className="case-study-viewer-content">
-          {pageCount === 0 && (
-            <p className="p-8 text-center text-sm text-white/70">Loading case study...</p>
-          )}
-          {Array.from({ length: pageCount }, (_, index) => (
-            <div key={`budget-case-study-page-${index + 1}`} className="case-study-page">
-              <canvas
-                ref={(canvas) => {
-                  canvasRefs.current[index] = canvas;
-                }}
-                aria-label={`Budget vs Actual case study page ${index + 1}`}
-              />
-            </div>
-          ))}
-          <div className="flex justify-center">
-            <a href={caseStudyPdfUrl} target="_blank" rel="noreferrer" className="btn-outline">
-              Open case study PDF
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function decodeXmlText(value: string) {
   return value
@@ -379,7 +272,7 @@ function BudgetVsActualFinanceAnalysisPage() {
             <div className="p-6 md:p-8">
               {activeView === "caseStudy" && (
                 <article className="-mx-6 -mt-6 overflow-hidden border-x border-b border-white/10 bg-black md:-mx-8 md:-mt-8">
-                  <CaseStudyPdf />
+                  <ProjectCaseStudyPdf fileUrl={caseStudyPdfUrl} title="Budget vs Actual" />
                 </article>
               )}
 
