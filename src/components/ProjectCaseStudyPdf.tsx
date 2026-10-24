@@ -95,38 +95,48 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
       }
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const pageNumber = Number((entry.target as HTMLElement).dataset.pageNumber);
-          if (entry.isIntersecting) {
-            void renderVisiblePage(pageNumber);
-            return;
-          }
+    const updateVisiblePages = () => {
+      const margin = 400;
+      pageRefs.current.forEach((page, index) => {
+        if (!page) return;
+        const pageNumber = index + 1;
+        const bounds = page.getBoundingClientRect();
+        const isNearViewport =
+          bounds.bottom >= -margin && bounds.top <= window.innerHeight + margin;
 
-          const task = renderTasks.get(pageNumber);
-          if (task) {
-            task.cancel();
-            renderTasks.delete(pageNumber);
-          }
+        if (isNearViewport) {
+          void renderVisiblePage(pageNumber);
+          return;
+        }
 
-          const canvas = canvasRefs.current[pageNumber - 1];
-          if (canvas) {
-            canvas.width = 0;
-            canvas.height = 0;
-          }
-        });
-      },
-      { rootMargin: "400px 0px" },
-    );
+        const task = renderTasks.get(pageNumber);
+        if (task) {
+          task.cancel();
+          renderTasks.delete(pageNumber);
+        }
 
-    pageRefs.current.forEach((page) => {
-      if (page) observer.observe(page);
-    });
+        const canvas = canvasRefs.current[index];
+        if (canvas) {
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+      });
+    };
+
+    let frame = 0;
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(updateVisiblePages);
+    };
+    updateVisiblePages();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
     return () => {
       cancelled = true;
-      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
       renderTasks.forEach((task) => task.cancel());
       renderTasks.clear();
     };
