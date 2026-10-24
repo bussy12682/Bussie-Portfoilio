@@ -16,6 +16,7 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
   const pageRefs = useRef<Array<HTMLDivElement | null>>([]);
   const pdfDocumentRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
   const renderTasksRef = useRef(new Map<number, pdfjsLib.RenderTask>());
+  const renderingPagesRef = useRef(new Set<number>());
 
   useEffect(() => {
     let cancelled = false;
@@ -53,18 +54,27 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
 
     let cancelled = false;
     const renderTasks = renderTasksRef.current;
+    const renderingPages = renderingPagesRef.current;
+    const isNearViewport = (page: HTMLDivElement) => {
+      const bounds = page.getBoundingClientRect();
+      const margin = 400;
+      return bounds.bottom >= -margin && bounds.top <= window.innerHeight + margin;
+    };
     const renderVisiblePage = async (pageNumber: number) => {
-      if (cancelled || renderTasks.has(pageNumber)) return;
+      if (cancelled || renderTasks.has(pageNumber) || renderingPages.has(pageNumber)) return;
 
       const canvas = canvasRefs.current[pageNumber - 1];
       const pageContainer = pageRefs.current[pageNumber - 1];
       const context = canvas?.getContext("2d");
       if (!canvas || !pageContainer || !context) return;
+      renderingPages.add(pageNumber);
       let renderTask: pdfjsLib.RenderTask | undefined;
+      let rendered = false;
+      let failed = false;
 
       try {
         const page = await pdfDocument.getPage(pageNumber);
-        if (cancelled) return;
+        if (cancelled || !isNearViewport(pageContainer)) return;
 
         const baseViewport = page.getViewport({ scale: 1 });
         const availableWidth = Math.max(pageContainer.clientWidth, 1);
@@ -83,28 +93,39 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
         });
         renderTasks.set(pageNumber, renderTask);
         await renderTask.promise;
+        rendered = true;
       } catch (renderError: unknown) {
-        if (!(renderError instanceof Error && renderError.name === "RenderingCancelledException")) {
+        if (renderError instanceof Error && renderError.name === "RenderingCancelledException") {
+          return;
+        }
+
+        failed = true;
+        if (!cancelled) {
           console.error(`Unable to render ${title} case study page ${pageNumber}`, renderError);
-          if (!cancelled) setError("Unable to display the case study in this browser.");
+          setError("Unable to display the case study in this browser.");
         }
       } finally {
         if (renderTask && renderTasks.get(pageNumber) === renderTask) {
           renderTasks.delete(pageNumber);
         }
+        renderingPages.delete(pageNumber);
+        if (!rendered && !failed && !cancelled) {
+          if (isNearViewport(pageContainer)) {
+            window.requestAnimationFrame(() => void renderVisiblePage(pageNumber));
+          } else {
+            canvas.width = 0;
+            canvas.height = 0;
+          }
+        }
       }
     };
 
     const updateVisiblePages = () => {
-      const margin = 400;
       pageRefs.current.forEach((page, index) => {
         if (!page) return;
         const pageNumber = index + 1;
-        const bounds = page.getBoundingClientRect();
-        const isNearViewport =
-          bounds.bottom >= -margin && bounds.top <= window.innerHeight + margin;
 
-        if (isNearViewport) {
+        if (isNearViewport(page)) {
           void renderVisiblePage(pageNumber);
           return;
         }
@@ -112,13 +133,12 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
         const task = renderTasks.get(pageNumber);
         if (task) {
           task.cancel();
-          renderTasks.delete(pageNumber);
-        }
-
-        const canvas = canvasRefs.current[index];
-        if (canvas) {
-          canvas.width = 0;
-          canvas.height = 0;
+        } else if (!renderingPages.has(pageNumber)) {
+          const canvas = canvasRefs.current[index];
+          if (canvas) {
+            canvas.width = 0;
+            canvas.height = 0;
+          }
         }
       });
     };
@@ -139,6 +159,7 @@ export function ProjectCaseStudyPdf({ fileUrl, title }: ProjectCaseStudyPdfProps
       window.removeEventListener("resize", scheduleUpdate);
       renderTasks.forEach((task) => task.cancel());
       renderTasks.clear();
+      renderingPages.clear();
     };
   }, [pageCount, title]);
 
