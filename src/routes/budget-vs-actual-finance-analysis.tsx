@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 import * as pdfjsLib from "pdfjs-dist";
-import PdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?worker";
 import caseStudyPdfUrl from "../../budget vs finance case study.pdf?url";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import dashboardAssetUrl from "../../budget vs finance dashbaord.pptx?url";
 import sqlScript from "../../Budget vs Actual Query script.txt?raw";
 
@@ -23,28 +23,24 @@ function CaseStudyPdf() {
 
   useEffect(() => {
     let cancelled = false;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+    const loadingTask = pdfjsLib.getDocument({ url: caseStudyPdfUrl });
 
-    async function renderPdf() {
-      if (!pdfjsLib.GlobalWorkerOptions.workerPort) {
-        pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
-      }
-
-      const pdfDocument = await pdfjsLib.getDocument({
-        url: caseStudyPdfUrl,
-      }).promise;
-
-      if (cancelled) return;
-      pdfDocumentRef.current = pdfDocument;
-      setPageCount(pdfDocument.numPages);
-    }
-
-    renderPdf().catch((renderError) => {
-      console.error("Unable to load case study PDF", renderError);
-      if (!cancelled) setError("Unable to load the case study PDF.");
-    });
+    loadingTask.promise
+      .then((pdfDocument) => {
+        if (cancelled) return;
+        pdfDocumentRef.current = pdfDocument;
+        setPageCount(pdfDocument.numPages);
+      })
+      .catch((loadError: unknown) => {
+        console.error("Unable to load Budget vs Actual case study PDF", loadError);
+        if (!cancelled) setError("Unable to display the case study in this browser.");
+      });
 
     return () => {
       cancelled = true;
+      void loadingTask.destroy();
+      pdfDocumentRef.current = null;
     };
   }, []);
 
@@ -54,11 +50,14 @@ function CaseStudyPdf() {
 
     async function renderPages() {
       const pdfDocument = pdfDocumentRef.current;
+      if (!pdfDocument) return;
+
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+        if (cancelled) return;
         const page = await pdfDocument.getPage(pageNumber);
         const canvas = canvasRefs.current[pageNumber - 1];
         const context = canvas?.getContext("2d");
-        if (!canvas || !context || cancelled) continue;
+        if (!canvas || !context) continue;
 
         const baseViewport = page.getViewport({ scale: 1 });
         const availableWidth = Math.max(canvas.parentElement?.clientWidth ?? 0, 1);
@@ -77,9 +76,9 @@ function CaseStudyPdf() {
       }
     }
 
-    renderPages().catch((renderError) => {
-      console.error("Unable to render case study PDF", renderError);
-      if (!cancelled) setError("Unable to render the case study PDF.");
+    renderPages().catch((renderError: unknown) => {
+      console.error("Unable to render Budget vs Actual case study PDF", renderError);
+      if (!cancelled) setError("Unable to display the case study in this browser.");
     });
 
     return () => {
@@ -87,23 +86,37 @@ function CaseStudyPdf() {
     };
   }, [pageCount]);
 
-  if (error) {
-    return <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">{error}</div>;
-  }
-
   return (
     <div className="case-study-viewer">
-      {pageCount === 0 && <p className="p-8 text-center text-sm text-white/70">Loading case study...</p>}
-      {Array.from({ length: pageCount }, (_, index) => (
-        <div key={`budget-case-study-page-${index + 1}`} className="case-study-page">
-          <canvas
-            ref={(canvas) => {
-              canvasRefs.current[index] = canvas;
-            }}
-            aria-label={`Budget vs Actual case study page ${index + 1}`}
-          />
+      {error ? (
+        <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">
+          <p>{error}</p>
+          <a href={caseStudyPdfUrl} target="_blank" rel="noreferrer" className="btn-outline mt-4">
+            Open case study PDF
+          </a>
         </div>
-      ))}
+      ) : (
+        <div className="case-study-viewer-content">
+          {pageCount === 0 && (
+            <p className="p-8 text-center text-sm text-white/70">Loading case study...</p>
+          )}
+          {Array.from({ length: pageCount }, (_, index) => (
+            <div key={`budget-case-study-page-${index + 1}`} className="case-study-page">
+              <canvas
+                ref={(canvas) => {
+                  canvasRefs.current[index] = canvas;
+                }}
+                aria-label={`Budget vs Actual case study page ${index + 1}`}
+              />
+            </div>
+          ))}
+          <div className="flex justify-center">
+            <a href={caseStudyPdfUrl} target="_blank" rel="noreferrer" className="btn-outline">
+              Open case study PDF
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -185,7 +198,9 @@ async function getPresentationSlides(fileUrl: string): Promise<SlideAsset[]> {
     if (zip.files[relsFile]) {
       const relsXml = await zip.files[relsFile].async("text");
       const imageTargets = Array.from(
-        relsXml.matchAll(/Type="http:\/\/schemas\.openxmlformats\.org\/officeDocument\/2006\/relationships\/image"[^>]*Target="([^"]+)"/g),
+        relsXml.matchAll(
+          /Type="http:\/\/schemas\.openxmlformats\.org\/officeDocument\/2006\/relationships\/image"[^>]*Target="([^"]+)"/g,
+        ),
       ).map((match) => match[1]);
 
       for (const target of imageTargets) {
@@ -271,9 +286,9 @@ function BudgetVsActualFinanceAnalysisPage() {
             </div>
 
             <div className="space-y-5">
-                          {slide.text && (
-                            <p className="text-sm leading-7 text-white/85 whitespace-pre-wrap">{slide.text}</p>
-                          )}
+              {slide.text && (
+                <p className="text-sm leading-7 text-white/85 whitespace-pre-wrap">{slide.text}</p>
+              )}
 
               {slide.images && slide.images.length > 0 && (
                 <div className="grid gap-4">
@@ -327,7 +342,12 @@ function BudgetVsActualFinanceAnalysisPage() {
       <main id="project-detail" className="pt-28 pb-16">
         <section className="relative mx-auto max-w-6xl px-0 sm:px-8">
           <div className="mb-8 px-5 sm:px-0">
-            <a href="/" className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10" aria-label="Back to portfolio" title="Back to Portfolio">
+            <a
+              href="/"
+              className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10"
+              aria-label="Back to portfolio"
+              title="Back to Portfolio"
+            >
               <span aria-hidden="true">←</span>
             </a>
             <div className="flex flex-wrap items-end justify-between gap-6">
@@ -363,14 +383,13 @@ function BudgetVsActualFinanceAnalysisPage() {
                 </article>
               )}
 
-              {activeView === "dashboard" && (
+              {activeView === "dashboard" &&
                 renderPresentationDeck(
                   "Dashboard",
                   "Performance Dashboard",
                   dashboardSlides,
                   "Loading dashboard slides…",
-                )
-              )}
+                )}
 
               {activeView === "sqlQuery" && (
                 <article className="rounded-3xl border border-white/10 bg-card/50 p-6">

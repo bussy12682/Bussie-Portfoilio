@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 import * as pdfjsLib from "pdfjs-dist";
-import PdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?worker";
 import globalSuperstoreCaseStudyPdfUrl from "../../global superstore case study.pdf?url";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import dashboardAssetUrl from "../../global superstore dashboard.pptx?url";
 import sqlScript from "../../global superstore script.txt?raw";
 
@@ -23,28 +23,24 @@ function GlobalSuperstoreCaseStudyPdf() {
 
   useEffect(() => {
     let cancelled = false;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+    const loadingTask = pdfjsLib.getDocument({ url: globalSuperstoreCaseStudyPdfUrl });
 
-    async function renderPdf() {
-      if (!pdfjsLib.GlobalWorkerOptions.workerPort) {
-        pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
-      }
-
-      const pdfDocument = await pdfjsLib.getDocument({
-        url: globalSuperstoreCaseStudyPdfUrl,
-      }).promise;
-
-      if (cancelled) return;
-      pdfDocumentRef.current = pdfDocument;
-      setPageCount(pdfDocument.numPages);
-    }
-
-    renderPdf().catch((renderError) => {
-      console.error("Unable to load Global Superstore case study PDF", renderError);
-      if (!cancelled) setError("Unable to load the case study PDF.");
-    });
+    loadingTask.promise
+      .then((pdfDocument) => {
+        if (cancelled) return;
+        pdfDocumentRef.current = pdfDocument;
+        setPageCount(pdfDocument.numPages);
+      })
+      .catch((loadError: unknown) => {
+        console.error("Unable to load Global Superstore case study PDF", loadError);
+        if (!cancelled) setError("Unable to display the case study in this browser.");
+      });
 
     return () => {
       cancelled = true;
+      void loadingTask.destroy();
+      pdfDocumentRef.current = null;
     };
   }, []);
 
@@ -54,11 +50,14 @@ function GlobalSuperstoreCaseStudyPdf() {
 
     async function renderPages() {
       const pdfDocument = pdfDocumentRef.current;
+      if (!pdfDocument) return;
+
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+        if (cancelled) return;
         const page = await pdfDocument.getPage(pageNumber);
         const canvas = canvasRefs.current[pageNumber - 1];
         const context = canvas?.getContext("2d");
-        if (!canvas || !context || cancelled) continue;
+        if (!canvas || !context) continue;
 
         const baseViewport = page.getViewport({ scale: 1 });
         const availableWidth = Math.max(canvas.parentElement?.clientWidth ?? 0, 1);
@@ -77,9 +76,9 @@ function GlobalSuperstoreCaseStudyPdf() {
       }
     }
 
-    renderPages().catch((renderError) => {
+    renderPages().catch((renderError: unknown) => {
       console.error("Unable to render Global Superstore case study PDF", renderError);
-      if (!cancelled) setError("Unable to render the case study PDF.");
+      if (!cancelled) setError("Unable to display the case study in this browser.");
     });
 
     return () => {
@@ -87,23 +86,47 @@ function GlobalSuperstoreCaseStudyPdf() {
     };
   }, [pageCount]);
 
-  if (error) {
-    return <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">{error}</div>;
-  }
-
   return (
     <div className="case-study-viewer">
-      {pageCount === 0 && <p className="p-8 text-center text-sm text-white/70">Loading case study...</p>}
-      {Array.from({ length: pageCount }, (_, index) => (
-        <div key={`global-superstore-case-study-page-${index + 1}`} className="case-study-page">
-          <canvas
-            ref={(canvas) => {
-              canvasRefs.current[index] = canvas;
-            }}
-            aria-label={`Global Superstore case study page ${index + 1}`}
-          />
+      {error ? (
+        <div className="rounded-2xl border border-red-400/30 bg-red-950/30 p-6 text-center text-sm text-red-200">
+          <p>{error}</p>
+          <a
+            href={globalSuperstoreCaseStudyPdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-outline mt-4"
+          >
+            Open case study PDF
+          </a>
         </div>
-      ))}
+      ) : (
+        <div className="case-study-viewer-content">
+          {pageCount === 0 && (
+            <p className="p-8 text-center text-sm text-white/70">Loading case study...</p>
+          )}
+          {Array.from({ length: pageCount }, (_, index) => (
+            <div key={`global-superstore-case-study-page-${index + 1}`} className="case-study-page">
+              <canvas
+                ref={(canvas) => {
+                  canvasRefs.current[index] = canvas;
+                }}
+                aria-label={`Global Superstore case study page ${index + 1}`}
+              />
+            </div>
+          ))}
+          <div className="flex justify-center">
+            <a
+              href={globalSuperstoreCaseStudyPdfUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-outline"
+            >
+              Open case study PDF
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -122,7 +145,13 @@ function decodeXmlText(value: string) {
 
 function isMeaningfulText(value: string) {
   const cleaned = value.trim();
-  return Boolean(cleaned) && !cleaned.includes("<") && !cleaned.includes(">") && !/^\d+$/.test(cleaned) && cleaned.length > 1;
+  return (
+    Boolean(cleaned) &&
+    !cleaned.includes("<") &&
+    !cleaned.includes(">") &&
+    !/^\d+$/.test(cleaned) &&
+    cleaned.length > 1
+  );
 }
 
 function resolveRelationshipTarget(slideFile: string, target: string) {
@@ -175,7 +204,9 @@ async function getPresentationSlides(fileUrl: string): Promise<SlideAsset[]> {
     if (zip.files[relsFile]) {
       const relsXml = await zip.files[relsFile].async("text");
       const imageTargets = Array.from(
-        relsXml.matchAll(/Type="http:\/\/schemas\.openxmlformats\.org\/officeDocument\/2006\/relationships\/image"[^>]*Target="([^"]+)"/g),
+        relsXml.matchAll(
+          /Type="http:\/\/schemas\.openxmlformats\.org\/officeDocument\/2006\/relationships\/image"[^>]*Target="([^"]+)"/g,
+        ),
       ).map((match) => match[1]);
 
       for (const target of imageTargets) {
@@ -234,7 +265,10 @@ function GlobalSuperstorePerformanceAnalyticsPage() {
         </div>
       ) : (
         slides.map((slide, slideIndex) => (
-          <article key={`${label}-${slide.title}-${slideIndex}`} className="rounded-3xl border border-white/10 bg-black/90 p-5 text-white">
+          <article
+            key={`${label}-${slide.title}-${slideIndex}`}
+            className="rounded-3xl border border-white/10 bg-black/90 p-5 text-white"
+          >
             <div className="mb-4 flex items-center justify-between gap-4 border-b border-white/10 pb-3">
               <span className="text-xs uppercase tracking-wider text-white/70">
                 {label} | {slide.title}
@@ -271,13 +305,27 @@ function GlobalSuperstorePerformanceAnalyticsPage() {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-background/60 backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
           <a href="/" className="flex items-center gap-2 font-semibold">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-accent to-[#1e40af] text-white shadow-glow">B</span>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-accent to-[#1e40af] text-white shadow-glow">
+              B
+            </span>
             <span>Busayo Analytics</span>
           </a>
           <ul className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-            <li><a href="/#portfolio" className="transition-colors hover:text-foreground">Portfolio</a></li>
-            <li><a href="/#about" className="transition-colors hover:text-foreground">About</a></li>
-            <li><a href="/#contact" className="transition-colors hover:text-foreground">Contact</a></li>
+            <li>
+              <a href="/#portfolio" className="transition-colors hover:text-foreground">
+                Portfolio
+              </a>
+            </li>
+            <li>
+              <a href="/#about" className="transition-colors hover:text-foreground">
+                About
+              </a>
+            </li>
+            <li>
+              <a href="/#contact" className="transition-colors hover:text-foreground">
+                Contact
+              </a>
+            </li>
           </ul>
         </nav>
       </header>
@@ -285,7 +333,12 @@ function GlobalSuperstorePerformanceAnalyticsPage() {
       <main id="project-detail" className="pb-16 pt-28">
         <section className="relative mx-auto max-w-6xl px-0 sm:px-8">
           <div className="mb-8 px-5 sm:px-0">
-            <a href="/" className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10" aria-label="Back to portfolio" title="Back to Portfolio">
+            <a
+              href="/"
+              className="fixed left-4 top-20 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-foreground shadow-lg backdrop-blur-md transition hover:bg-white/10"
+              aria-label="Back to portfolio"
+              title="Back to Portfolio"
+            >
               <span aria-hidden="true">←</span>
             </a>
             <div className="flex flex-wrap items-end justify-between gap-6">
@@ -316,14 +369,21 @@ function GlobalSuperstorePerformanceAnalyticsPage() {
                   <GlobalSuperstoreCaseStudyPdf />
                 </article>
               )}
-              {activeView === "dashboard" && renderPresentationDeck("Dashboard", "Performance Dashboard", dashboardSlides)}
+              {activeView === "dashboard" &&
+                renderPresentationDeck("Dashboard", "Performance Dashboard", dashboardSlides)}
               {activeView === "sqlQuery" && (
                 <article className="rounded-3xl border border-white/10 bg-card/50 p-6">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">SQL Query</span>
-                    <span className="rounded-full border border-accent/40 px-3 py-1 text-[11px] uppercase text-accent">Global Superstore Script</span>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                      SQL Query
+                    </span>
+                    <span className="rounded-full border border-accent/40 px-3 py-1 text-[11px] uppercase text-accent">
+                      Global Superstore Script
+                    </span>
                   </div>
-                  <pre className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-background/70 p-5 text-sm leading-7 text-muted-foreground">{sqlQuery || "No SQL query file content found."}</pre>
+                  <pre className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-background/70 p-5 text-sm leading-7 text-muted-foreground">
+                    {sqlQuery || "No SQL query file content found."}
+                  </pre>
                 </article>
               )}
             </div>
